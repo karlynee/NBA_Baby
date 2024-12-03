@@ -4,3 +4,6 @@ google-auth
 pandas-gbq
 db-dtypes
 plotly
+pybase64
+requests
+beautifulsoup4
