@@ -15,6 +15,11 @@ import base64
 import re
 import requests
 from bs4 import BeautifulSoup
+from unidecode import unidecode 
+from datetime import datetime, timedelta
+import matplotlib.pyplot as plt
+from matplotlib.patches import Rectangle
+import numpy as np
 
 # Cache Data
 #st.cache_data(ttl=600)
@@ -91,52 +96,55 @@ def scorecards (df,team_name,season,metric_column,rank_column):
     team_3p = team_data[metric_column]/team_data['G']
   team_rank_3p = team_data[rank_column]
 
+  # SCORECARD STREAMLIT
+  return st.metric(metric_column, team_3p, f'Rank: {int(team_rank_3p)}/30')
+
   # Créer un graphique vide
-  fig_team_3p = go.Figure()
-  suffix = ''
-  if "_" in metric_column: suffix = '%'
+#   fig_team_3p = go.Figure()
+#   suffix = ''
+#   if "_" in metric_column: suffix = '%'
 
-  fig_team_3p.add_trace(go.Indicator(
-      mode="number",
-      value=team_3p,# Valeur du KPI
-      title={'text': f"{metric_column}",'font': {'size': 20}},  # Nom du KPI
-      number={'suffix': f"{suffix}", 'font': {'size': 40}},  # Taille de la valeur du KPI
-  ))
+#   fig_team_3p.add_trace(go.Indicator(
+#       mode="number",
+#       value=team_3p,# Valeur du KPI
+#       title={'text': f"{metric_column}",'font': {'size': 20}},  # Nom du KPI
+#       number={'suffix': f"{suffix}", 'font': {'size': 40}},  # Taille de la valeur du KPI
+#   ))
 
-  # Ajouter le rank
-  fig_team_3p.add_annotation(
-      x=0.5,
-      y=0.3,
-      text=f"Rank: {team_rank_3p}",
-      showarrow=False,
-      font=dict(size=15,color="red"),
-      align="center",
-      xanchor="center",
-      yanchor="top",
-      )
+#   # Ajouter le rank
+#   fig_team_3p.add_annotation(
+#       x=0.5,
+#       y=0.3,
+#       text=f"Rank: {team_rank_3p}",
+#       showarrow=False,
+#       font=dict(size=15,color="red"),
+#       align="center",
+#       xanchor="center",
+#       yanchor="top",
+#       )
 
-  # Mise en page scorecard
-  fig_team_3p.update_layout(
-      height=220,
-      width=200,
-      showlegend=False,
-      margin=dict(t=50, b=50, l=20, r=20),
-      shapes=[
-          {
-              'type': 'rect',
-              'x0': 0,
-              'y0': 0,
-              'x1': 1,
-              'y1': 1,
-              'line': {
-                  'color': 'black',
-                  'width': 2
-              },
-              'fillcolor': 'rgba(255, 255, 255, 0)',
-          }
-      ]
-  )
-  return fig_team_3p
+#   # Mise en page scorecard
+#   fig_team_3p.update_layout(
+#       height=220,
+#       width=200,
+#       showlegend=False,
+#       margin=dict(t=50, b=50, l=20, r=20),
+#       shapes=[
+#           {
+#               'type': 'rect',
+#               'x0': 0,
+#               'y0': 0,
+#               'x1': 1,
+#               'y1': 1,
+#               'line': {
+#                   'color': 'black',
+#                   'width': 2
+#               },
+#               'fillcolor': 'rgba(255, 255, 255, 0)',
+#           }
+#       ]
+#   )
+#   return fig_team_3p
 
 ### TEAMS - Donut Chart Win Loss Global
 def donutWL (df,team_name,season):
@@ -203,48 +211,47 @@ def shootbyteam (df,team_name,season):
 
 
 ### TEAMS - Major 5 by team
-# def major5byteam (df,team_name,season):
-#   # Filtrer les données correspondant à l'équipe et à la saison choisies
-#   player_data = df[
-#       (df['Team'] == team_name)
-#       (df['Season'] == season)
-#   ]
+def major5byteam (df,team_name,season):
+    # Filtrer les données correspondant à l'équipe et à la saison choisies
+    player_data = df[(df['Team'] == team_name) & (df['Season'] == season)]
+    # Créer liste avec toutes les positions
+    positions = ['PG', 'SG', 'SF', 'PF', 'C']
 
-#   # Créer liste avec toutes les positions
-#   positions = ['PG', 'SG', 'SF', 'PF', 'C']
+    # Créer liste vide pour y mettre le meilleur joueur par position
+    top_players = []  
+    for pos in positions:
+        pos_data = player_data[player_data['Pos'] == pos]
+        if not pos_data.empty:
+            top_player = pos_data.sort_values(by='GS', ascending=False).iloc[0]
+            top_players.append({'Game starters': top_player['Player'], 'Position': pos})
+        else:
+            top_players.append({'Game starters': 'N/A', 'Position': pos})
 
-#   # Créer liste vide pour y mettre le meilleur joueur par position
-#   top_players = []
+    # Créer nouvelle DF avec les top players
+    top_players_df = pd.DataFrame(top_players)
 
-#   for pos in positions:
-#       pos_data = player_data[player_data['Pos'] == pos]
-#       if not pos_data.empty:
-#           top_player = pos_data.sort_values(by='GS', ascending=False).iloc[0]
-#           top_players.append({'Game starters': top_player['Player'], 'Position': pos})
-#       else:
-#           top_players.append({'Game starters': 'N/A', 'Position': pos})
+    # Tableau avec plotly
+    fig_startingfive = go.Figure(data=[go.Table(
+        header=dict(values=['Game starters', 'Position'],
+                    fill_color='lightskyblue',
+                    align='left'),
+        cells=dict(values=[top_players_df['Game starters'], top_players_df['Position']],
+                fill_color='lightcyan',
+                align='left'))
+    ])
 
-#   # Créer nouvelle DF avec les top players
-#   top_players_df = pd.DataFrame(top_players)
+    fig_startingfive.update_layout(
+        width=500,
+        height=400
+    )
 
-#   # Tableau avec plotly
-#   fig_startingfive = go.Figure(data=[go.Table(
-#       header=dict(values=['Game starters', 'Position'],
-#                   fill_color='lightskyblue',
-#                   align='left'),
-#       cells=dict(values=[top_players_df['Game starters'], top_players_df['Position']],
-#                 fill_color='lightcyan',
-#                 align='left'))
-#   ])
-
-#   fig_startingfive.update_layout(
-#       width=500,
-#       height=400
-#   )
-
-#   return fig_startingfive.show()
+    return fig_startingfive
 
 ### TEAMS - WIN LOSS GRAPH 
+import streamlit as st
+import pandas as pd
+
+
 def win_loss(_df, _team_name, _season):
     # Filtrer les données sur l'équipe et la saison
     team_data = _df[(_df['Home_Team'] == _team_name) & (_df['Season'] == _season)]
@@ -272,14 +279,14 @@ def win_loss(_df, _team_name, _season):
         x=wins['Month'],
         y=wins['Count'],
         name='Wins',
-        marker_color='green'
+        marker_color='#1F4186'
     )
 
     trace_losses = go.Bar(
         x=losses['Month'],
         y=losses['Count'],
         name='Losses',
-        marker_color='red'
+        marker_color='#C22737'
     )
 
     # Créer la figure
@@ -287,7 +294,7 @@ def win_loss(_df, _team_name, _season):
 
     # Configurer la disposition
     fig.update_layout(
-        title=f"{_team_name}: Home Wins/Losses by Month in {_season}",
+        title=f"Home Wins/Losses by Month in {_season}",
         xaxis_title="Month",
         yaxis_title="Count",
         barmode='group',
@@ -311,46 +318,119 @@ def scorecard_rank(_df,_team_name,_season):
     # Handle case when no data is returned, assign a default value (e.g., NaN or a custom message)
     team_rank = None
 
-  # Créer un graphique pour le Rank de l'équipe sélectionnée
-  fig_team_rank = go.Figure()
+  # SCORECARD STREAMLIT
+  return st.metric(label = 'Rank by Conference', value = f'{team_rank}/15', delta=None)
 
-  # Ajouter un trace pour l'indicateur Rank de cette équipe
-  fig_team_rank.add_trace(go.Indicator(
-    mode='number',
-    value=team_rank,
-    title={'text': f"Rank by Conference",'font':{'size':20}},
-    number={'suffix':'','font':{'size':40}},
-  ))
-  # Mise en page de la scorecard
-  fig_team_rank.update_layout(
-    height=210,  # Hauteur de la figure
-    width=260,
-    showlegend=False,  # Désactiver la légende
-    margin=dict(t=20, b=70, l=20, r=20),  # Ajuster les marges pour laisser de la place au rang
-    shapes=[  # Ajouter un rectangle autour de la scorecard
-        {
-            'type': 'rect',
-            'x0': 0,  # Position gauche
-            'y0': 0,  # Position bas
-            'x1': 1,  # Position droite
-            'y1': 1,  # Position haut
-            'line': {
-                'color': 'black',  # Couleur de l'encadré
-                'width': 2  # Épaisseur de la ligne
-            },
-            'fillcolor': 'rgba(255, 255, 255, 0)',  # Couleur de fond transparent
-        }
-    ]
-  )
+#   # Créer un graphique pour le Rank de l'équipe sélectionnée
+#   fig_team_rank = go.Figure()
 
-  # Afficher le graphique
-  return fig_team_rank
+#   # Ajouter un trace pour l'indicateur Rank de cette équipe
+#   fig_team_rank.add_trace(go.Indicator(
+#     mode='number',
+#     value=team_rank,
+#     title={'text': f"Rank by Conference",'font':{'size':20}},
+#     number={'suffix':'','font':{'size':40}},
+#   ))
+#   # Mise en page de la scorecard
+#   fig_team_rank.update_layout(
+#     height=210,  # Hauteur de la figure
+#     width=260,
+#     showlegend=False,  # Désactiver la légende
+#     margin=dict(t=20, b=70, l=20, r=20),  # Ajuster les marges pour laisser de la place au rang
+#     shapes=[  # Ajouter un rectangle autour de la scorecard
+#         {
+#             'type': 'rect',
+#             'x0': 0,  # Position gauche
+#             'y0': 0,  # Position bas
+#             'x1': 1,  # Position droite
+#             'y1': 1,  # Position haut
+#             'line': {
+#                 'color': 'black',  # Couleur de l'encadré
+#                 'width': 2  # Épaisseur de la ligne
+#             },
+#             'fillcolor': 'rgba(255, 255, 255, 0)',  # Couleur de fond transparent
+#         }
+#     ]
+#  )
+
+#   # Afficher le graphique
+#   return fig_team_rank
 
 # ----------------------------------- Players ---------------------------------
+### PLAYERS - PLAYER ID CARDS
+def sc_pres(df_players_all_stats, player_name, season, metric_column):
+    # Filtrer sur le joueur et la saison
+    player_data = df_players_all_stats[
+        (df_players_all_stats['Player'] == player_name) & (df_players_all_stats['Season'] == season)
+    ]
+
+    # Vérification qu'on a trouvé des données
+    if player_data.empty:
+        st.error(f"Pas de données trouvées pour le joueur '{player_name}' lors de la saison '{season}'")
+        return None
+
+    player_data = player_data.iloc[0]  # Extraire la première ligne
+
+    # Récupérer la métrique
+    if metric_column in player_data:
+        card = player_data[metric_column]
+    else:
+        st.error(f"La colonne '{metric_column}' n'existe pas dans les données du joueur.")
+        return None
+
+    # Vérifier si la métrique est numérique ou textuelle
+    if isinstance(card, (int, float, np.int64)):
+        suffix = '%' if "_" in metric_column else ''
+
+        # Créer un graphique pour une valeur numérique
+        fig_pres = go.Figure()
+        fig_pres.add_trace(go.Indicator(
+            mode="number",
+            value=card,
+            title={'text': f"{metric_column}", 'font': {'size': 20}},
+            number={'suffix': suffix, 'font': {'size': 40}},
+        ))
+
+    elif isinstance(card, str):
+        # Créer un graphique pour une valeur textuelle
+        fig_pres = go.Figure()
+        fig_pres.add_trace(go.Indicator(
+            mode="number+delta",
+            value=0,
+            title={'text': f"{metric_column}", 'font': {'size': 20}},
+            number={'prefix': f"{card}", 'font': {'size': 40}},
+        ))
+    else:
+        st.error(f"Type de donnée inattendu pour '{metric_column}': {type(card)}")
+        return None
+
+    # Mise en page scorecard
+    fig_pres.update_layout(
+        height=220,
+        width=800,
+        showlegend=False,
+        margin=dict(t=50, b=50, l=20, r=20),
+        shapes=[
+            {
+                'type': 'rect',
+                'x0': 0,
+                'y0': 0,
+                'x1': 1,
+                'y1': 1,
+                'line': {
+                    'color': 'black',
+                    'width': 2
+                },
+                'fillcolor': 'rgba(255, 255, 255, 0)',
+            }
+        ]
+    )
+
+    return fig_pres
+
 ### PLAYERS - JAUGES
 #Code généré par Catalina
 def jauge_players(player_name, season, df_players_all_stats):
-
     # Agréger les données par joueur et saison
     df_aggregated = df_players_all_stats.groupby(['Player', 'Season']).agg({
         'FT_': 'mean',   # Moyenne pour les pourcentages
@@ -406,6 +486,7 @@ def jauge_players(player_name, season, df_players_all_stats):
     )
     return gauges
 
+    
 ### PLAYERS - DISTANCE TERRAIN
 #Code généré par Catalina
 def terrain(_df_players_all_stats,_player_filter, _season_filter):
@@ -537,25 +618,96 @@ def terrain(_df_players_all_stats,_player_filter, _season_filter):
 
   #st.plotly_chart(terrain(df_players_all_stats,_player_filter, _season_filter)) #Streamlit
 
-#### RANK TOP 3 PLAYERS
+#### PLAYERS - SCORE CARDS
+#Catalina
+def players_scorecards(df_players_all_stats, mean_players_advanced_22_23_24, _player_filter, _season_filter):
+
+    # Filtrer les données pour le joueur et la saison dans les stats individuelles
+    player_stats = df_players_all_stats.query("Player == @_player_filter and Season == @_season_filter")
+    if player_stats.empty:
+        raise ValueError(f"Aucune donnée trouvée pour le joueur '{_player_filter}' et la saison '{_season_filter}'.")
+
+    # Filtrer les moyennes uniquement par saison
+    mean_stats = mean_players_advanced_22_23_24.query("season == @_season_filter")
+    if mean_stats.empty:
+        raise ValueError(f"Aucune donnée trouvée pour la saison '{_season_filter}'.")
+
+    # Statistiques à afficher
+    stats = ['PTS', 'TRB', 'AST', 'STL', 'BLK', 'MP']
+
+    sc_players = go.Figure()
+
+    # Ajouter les *scorecards* pour chaque statistique
+    for i, stat in enumerate(stats):
+        value = player_stats[stat].iloc[0]
+        mean_value = mean_stats[stat].mean()  # Moyenne sur toute la saison
+
+        # Configurer le suffixe et le mode d'affichage
+        suffix = '' if stat in ['PTS', 'MP', 'TRB', 'AST'] else '%'
+        # Modified: Define valueformat as a string
+        valueformat = f",.2f{suffix}"  # Example: ',.2f%' for percentage with 2 decimal places
+
+        # Ajouter une *scorecard*
+        sc_players.add_trace(go.Indicator(
+            mode="number",
+            value=value,
+            title={'text': f"<b>{stat}</b>", 'font': {'size': 18}},
+            # Modified: Use the string valueformat and set font size outside
+            number={'valueformat': valueformat, 'font': {'size': 30, 'color': 'rgba(31,65,134,255)'}},
+            domain={'row': i // 3, 'column': i % 3}
+        ))
+
+        # Ajouter l'annotation pour la moyenne
+        sc_players.add_annotation(
+            x=(i % 3) / 2.5 + 0.1,  # Ajuste pour positionner les annotations dans la grille
+            y=1 - (i // 3) / 1.5 - 0.3,
+            text=f"<span style='color: rgba(31,65,134,255);'>Moyenne : {mean_value:.2f}{suffix}</span>",
+            showarrow=False,
+            font=dict(size=12, color='rgba(31,65,134,255)'),
+            xanchor="center",
+            yanchor="top",
+        )
+
+
+    # Configuration générale
+    sc_players.update_layout(
+        grid=dict(rows=2, columns=3, pattern="independent"),
+        height=600,
+        width=900,
+        paper_bgcolor="white",
+        title={
+            'text': f"<b>Scorecards : {_player_filter} - Saison {_season_filter}</b>",
+            'x': 0.5,
+            'font': {'size': 22}
+        },
+        margin=dict(t=50, b=50, l=20, r=20)
+    )
+
+    # Mise en page de la figure
+    sc_players.update_layout(
+        template="plotly_dark",
+        grid={'rows': 2, 'columns': 3, 'pattern': "independent"},
+        height=600,
+        title=f"<b>Scorecards : {_player_filter} - Saison {_season_filter}</b>",
+        title_font_size=22,
+        title_x=0.5,
+        margin=dict(t=50, b=50, l=20, r=20),
+    )
+    return  sc_players
+
+
+#### GLOBAL - RANK TOP 3 PLAYERS
 #Code généré par Jeremy
-def Rank_top_player(df,season):
-
-    # Ma datafram
-    data = df
-    df_top_players = pd.DataFrame(data)
-
-    # Ajouter une variable pour sélectionner l'année
-    #selected_year = "22-23" #valeur a changer selon l'année
+def Rank_top_player(_df,_season):
 
     # Filtrer le DataFrame selon l'année sélectionnée
-    df_player_top_y = df_top_players[df_top_players['Season'] == season]
+    df_player_top_y = _df[_df['Season'] == _season]
 
     # Fonction pour récupérer les 3 meilleures équipes pour une colonne donnée
-    def top_3(df, column):
-        return df.nlargest(3, column)[["Player", column]].reset_index(drop=True)
+    def top_3(_df, column):
+        return _df.nlargest(3, column)[["Player", column]].reset_index(drop=True)
 
-    # Récupérer les top 3 pour chaque colonne ("A", "D", "M")
+    # Récupérer les top 3 pour chaque colonne ("PTS", "TRB", "AST")
     top_PTS = top_3(df_player_top_y, "PTS")
     top_TRB = top_3(df_player_top_y, "TRB")
     top_AST = top_3(df_player_top_y, "AST")
@@ -576,7 +728,7 @@ def Rank_top_player(df,season):
     pivot_table = pd.pivot_table(
         summary_table,
         values="Player",  # Les équipes sont affichées dans les cellules
-        index="Criterion",  # Les critères ("A", "D", "M")
+        index="Criterion",  # Les critères ("PTS", "TRB", "AST")
         columns="Rank",  # Les colonnes correspondent aux rangs (Top 1, Top 2, Top 3)
         aggfunc=lambda x: " / ".join(x),  # Si plusieurs équipes ont la même position, les concaténer
         fill_value="N/A"  # Valeur par défaut si un critère manque
@@ -588,18 +740,17 @@ def Rank_top_player(df,season):
 
     return pivot_table
 
-### RANK TOP 3 TEAMS
+### GLOBAL - RANK TOP 3 TEAMS
 def Rank_top_teams(_df,_season):
-  
+
   # Filtrer le DataFrame selon l'année sélectionnée
   df_rk_team = _df[_df['Season'] == _season]
 
   # Fonction pour récupérer les 3 meilleures équipes pour une colonne donnée
   def top_3(df, column):
       return df.nlargest(3, column)[["Team", column]].reset_index(drop=True)
-  
-  print(df_rk_team.columns)
-  # Récupérer les top 3 pour chaque colonne ("A", "D", "M")
+
+  # Récupérer les top 3 pour chaque colonne ("ORtg", "TRB", "AST")
   rank_ORtg = top_3(df_rk_team, "ORtg")
   rank_TRB = top_3(df_rk_team, "TRB")
   rank_AST = top_3(df_rk_team, "AST")
@@ -629,17 +780,18 @@ def Rank_top_teams(_df,_season):
   # Renommer les colonnes pour plus de clarté
   pivot_table.columns = ["ORtg", "TRB", "AST"]
 
-
   return pivot_table
 
-### RANK CONFERENCE
-def Rank_conference_W_E(_df,season):
 
-    df_rk_top = _df[_df["Season"] == season]  # rank_win_ratio, Team, Conference, W, L, Win_Ratio
+### GLOBAL - RANK CONFERENCE
+def Rank_conference_W_E(_df,_season):
+
+    # Filtrage des données selon la saison sélectionnée
+    df_rk_top = _df[_df["Season"] == _season]  # rank_win_ratio, Team, Conference, W, L, Win_Ratio
 
     # Filtrage des données pour les conférences ouest et est
-    df_RK_filtered_West = df_rk_top[df_rk_top["Conference"] == "West"].round(2)
-    df_RK_filtered_East = df_rk_top[df_rk_top["Conference"] == "East"].round(2)
+    df_RK_filtered_West = df_rk_top[df_rk_top["Conference"] == "West"].round(2).sort_values(by="rank_win_ratio", ascending=True)
+    df_RK_filtered_East = df_rk_top[df_rk_top["Conference"] == "East"].round(2).sort_values(by="rank_win_ratio", ascending=True)
 
     # Sélection des colonnes que vous souhaitez afficher
     columns_to_display = ["rank_win_ratio", "Team", "Conference", "W", "L", "Win_Ratio"]  # Exemple des colonnes souhaitées
@@ -652,7 +804,7 @@ def Rank_conference_W_E(_df,season):
 
     # Vérifier si les données ne sont pas vides
     if df_RK_filtered_West.empty or df_RK_filtered_East.empty:
-        print(f"Aucune donnée trouvée pour la saison {season}. Vérifiez les filtres.")
+        print(f"Aucune donnée trouvée pour la saison {_season}. Vérifiez les filtres.")
     else:
         # Création de sous-graphiques
         fig = make_subplots(
@@ -703,25 +855,114 @@ def Rank_conference_W_E(_df,season):
         fig.update_layout(
             height=600,
             width=1400,
-            title_text=f"Classement par conférence ({season})",
+            title_text=f"Classement par conférence ({_season})",
             title_x=0.5,
             title_font=dict(size=20)
         )
 
     return fig
 
-# --------------------------------- Scraping ----------------------------------------
-# Fonction pour générer l'URL du joueur en fonction de son nom
+# GLOBAL - SCORECARD YESTERDAY'S MATCH
+# ----------------------- Ne pas utiliser
+def draw_scorecard(team1_name, team1_score, team2_name, team2_score):
+    fig, ax = plt.subplots()
+    ax.scatter(6, 3)
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
+    ax.axis("off")
+
+    # Ajouter un rectangle autour
+    ax.add_patch(Rectangle((0.05, 0.2), 0.9, 0.6, fill=None, edgecolor="black", lw=2))
+
+    # Ajouter les noms des équipes
+    ax.text(0.3, 0.7, team1_name, ha="center", va="center", fontsize=16, fontweight="bold", color="blue")
+    ax.text(0.7, 0.7, team2_name, ha="center", va="center", fontsize=16, fontweight="bold", color="red")
+
+    # Ajouter les scores
+    ax.text(0.3, 0.4, str(team1_score), ha="center", va="center", fontsize=20, color="black")
+    ax.text(0.7, 0.4, str(team2_score), ha="center", va="center", fontsize=20, color="black")
+
+    # Ajouter "vs" au centre
+    ax.text(0.5, 0.55, "vs", ha="center", va="center", fontsize=16, color="black", fontstyle="italic")
+    print(fig.axes)
+    return fig
+
+def create_scorecard_match_yesterday():
+# Étape 1 : Déterminer la date de la veille
+    yesterday = (datetime.now() - timedelta(days=2)).strftime('%Y-%m-%d')
+    
+    # Construire l'URL de la page de boxscores
+    base_url = "https://www.basketball-reference.com/boxscores/"
+    url = f"{base_url}?month={yesterday.split('-')[1]}&day={yesterday.split('-')[2]}&year={yesterday.split('-')[0]}"
+
+    # Étape 2 : Récupérer le contenu de la page
+    headers = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+    }
+    response = requests.get(url, headers=headers)
+    
+    if response.status_code != 200:
+        print(f"Erreur lors de l'accès à la page : {response.status_code}")
+    else:
+    # Étape 3 : Analyser le HTML avec BeautifulSoup
+        soup = BeautifulSoup(response.text, 'html.parser')
+        games = soup.find_all('div', class_='game_summary')
+        
+    if not games:
+        print("Aucun match trouvé pour cette date.")
+    else:
+        for game in games:
+            # Récupérer les équipes
+            team_rows = game.find_all('tr')
+            if len(team_rows) >= 2:
+                # Ligne de la première équipe
+                team1_name = team_rows[0].find('a').text
+                team1_score = int(team_rows[0].find_all('td')[1].text)
+                # Ligne de la deuxième équipe
+                team2_name = team_rows[1].find('a').text
+                team2_score = int(team_rows[1].find_all('td')[1].text)
+                # Fonction pour dessiner une "scorecard"
+                draw_scorecard(team1_name, team1_score, team2_name, team2_score)
+
+
+
+# -------------------------------------------- Scraping ----------------------------------------
+# Logo Team
+# Code generated by Karlyne & Thomas
+def get_team_logos (_team_name):
+  # Step 1: Get the HTML content of the webpage
+  url = "https://www.nba.com/teams"
+  response = requests.get(url)
+  if response.status_code != 200:
+    print(f"Erreur lors de l'accès à {player_url} : {response.status_code}")
+    return None
+
+  soup = BeautifulSoup(response.content, 'html.parser')
+
+  # Step 2: Find the first image in the webpage
+  img_tag = soup.find('img', {'title': f'{_team_name} Logo'})  # You can use find_all if you want multiple images
+
+  # Step 3: Extract the image URL
+  if img_tag:
+    img_url = img_tag['src']
+    return img_url
+  else:
+    print(f"Logo de {_team_name} introuvable sur la page.")
+    return None
+
+
+# Photo Player
 # Code generated by Thomas
+
 def get_player_url(player_name):
     # Séparer le prénom et le nom
     name_parts = player_name.lower().split()
 
     # Le nom de famille est la dernière partie
-    last_name = name_parts[-1]
+    last_name = unidecode(name_parts[-1])
 
     # Le prénom est la première partie
-    first_name = name_parts[0]
+    first_name = unidecode(name_parts[0])
 
     # Créer le format d'URL en utilisant la première lettre du nom de famille
     last_initial = last_name[0]
@@ -734,7 +975,7 @@ def get_player_url(player_name):
 def get_player_image_url(player_name):
     # Récupérer l'URL de la page du joueur
     player_url = get_player_url(player_name)
-
+    print (player_name)
     # Étape 1 : Récupérer la page joueur
     response = requests.get(player_url)
     if response.status_code != 200:
@@ -745,7 +986,10 @@ def get_player_image_url(player_name):
     soup = BeautifulSoup(response.text, 'html.parser')
 
     # Étape 3 : Trouver l'image du joueur (en vérifiant l'attribut alt pour le nom du joueur)
-    img_tag = soup.find('img', {'alt': re.compile(rf"Photo of {re.escape(player_name)}", re.IGNORECASE)})
+    #img_tag = soup.find('img', {'alt': re.compile(rf"Photo of {re.escape(player_name)}", re.IGNORECASE)})
+    img_tag = soup.find('img', {'itemscope': 'image'})
+
+    print(img_tag)
 
     if img_tag:
         img_url = img_tag['src']
@@ -753,7 +997,7 @@ def get_player_image_url(player_name):
         # Vérifier si l'URL est absolue ou relative
         if not img_url.startswith("http"):
             img_url = f"https://www.basketball-reference.com{img_url}"
-
+            print(img_url)
         return img_url
     else:
         print(f"Photo de {player_name} introuvable sur la page.")

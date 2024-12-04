@@ -7,3 +7,6 @@ plotly
 pybase64
 requests
 beautifulsoup4
+Unidecode
+Matplotlib
+numpy

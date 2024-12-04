@@ -1,6 +1,11 @@
 [theme]
-primaryColor = "#1F4186"
-backgroundColor = "#D6DBDC"
-secondaryBackgroundColor = "#C0C2C6"
-textColor = "#222028"
+primaryColor = "#1D428A"
+backgroundColor = "#F3F4F6" 
+secondaryBackgroundColor = "#253C73"   # White
+textColor = "#222028"   # Dark Grey
 font = "sans serif"
+
+[client]
+showSidebarNavigation = false
+
+

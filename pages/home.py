@@ -35,23 +35,20 @@ def main():
     layout="wide",   # 'centered' ou 'wide'
     )
 
+    st.header('Home')
     # Sidebar navigation
-    # st.sidebar.title('🏀 NBAddicts 🏀')
-    # st.sidebar.page_link('pages/home.py', label='🏠 Home')
-    # st.sidebar.page_link('pages/players.py', label='⛹️ Players')
-    # st.sidebar.page_link('pages/teams.py', label='🤝 Teams')
-    # st.sidebar.page_link('pages/pronostics.py', label='🔮 Future Games Predictions')
+    st.sidebar.image("https://cdn.nba.com/logos/leagues/logo-nba.svg", use_container_width=True)
 
-    st.markdown( """ <style> /* Style for sidebar title */ [data-testid="stSidebar"] h1 { color: #ffffff; /* Change title color */ font-size: 24px; /* Change title font size */ font-weight: bold; /* Make title bold */ } /* Style for links in the sidebar */ [data-testid="stSidebar"] .css-q8sbsg { color: #ffffff !important; /* Link text color */ font-size: 18px; /* Adjust font size */ font-weight: bold; /* Make links bold */ } /* Hover effect for links */ [data-testid="stSidebar"] .css-q8sbsg:hover { color: #E76F51 !important; /* Change color on hover */ text-decoration: underline; /* Underline on hover */ } </style> """, unsafe_allow_html=True, )    # Sidebar navigation
     st.sidebar.title('🏀 NBAddicts 🏀')
     st.sidebar.page_link('pages/home.py', label='🏠 Home')
     st.sidebar.page_link('pages/players.py', label='⛹️ Players')
     st.sidebar.page_link('pages/teams.py', label='🤝 Teams')
     st.sidebar.page_link('pages/pronostics.py', label='🔮 Future Games Predictions')
 
+
     # Title
-    st.title("Welcome to NBAddicts")
-    st.write("Where statistics and NBA make a great match ❤️")
+    st.title("Welcome to the NBAddicts dashboard")
+    st.header("Where statistics and NBA make a great match")
 
     # 2. Seasons buttons
     #season = st.radio("Select a season:",('2022-2023', '2023-2024'))
@@ -66,11 +63,6 @@ def main():
         if col2.button("2023-2024"):
             st.session_state.selected_season = '23-24'
 
-    # 2. Side bar
-    st.sidebar.image("https://cdn.nba.com/logos/leagues/logo-nba.svg", use_container_width=True)
-    #st.sidebar.title("Teams")
-    #option = st.sidebar.selectbox("Pick you team :", ["Option 1", "Option 2", "Option 3"])
-    #st.write(f"Vous avez sélectionné : {option}")
 
     # -------------------------------- Call Functions
     ## team_name = 'Boston Celtics'
