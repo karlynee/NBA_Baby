@@ -1528,7 +1528,7 @@ def predict_team1_win(_team1_name, _team2_name, df_prediction_base_path, model, 
     columns.insert(1, 'Team2')  # Insert 'Team2' at index 1
     # Reorder the DataFrame
     combined_features = combined_features[columns]
-    display(combined_features)
+    #display(combined_features)
     # Predict the probability and label
     probability = model.predict_proba(combined_features)[:, 1][0]  # Probability of Team1 winning
     prediction = model.predict(combined_features)[0]  # 0 or 1
