@@ -115,7 +115,7 @@ def main():
             st.session_state.selected_season = '23-24'
 
     with st.container():
-        st.write("")
+        st.title(" ")
 
     # -------------------------------- Top 3 tables
     rank_top_player = Rank_top_player(df_players_all_stats,st.session_state.selected_season)
