@@ -97,7 +97,7 @@ with st.container():
             st.write(f'Select an Away Team')
 
 with st.container():
-    col1, col2, col3 = st.columns([1, 1, 1])
+    col1, col2, col3 = st.columns([0.5, 1, 0.5])
 
     # Pred
     with col2:
@@ -106,7 +106,7 @@ with st.container():
             model = load_model_with_pickle('pred/LR_model.pkl')
             # Replace `model` and `scaler` with your actual objects
             probability, prediction = predict_team1_win(option_home, option_away, 'pred/df_prediction_base.csv', model, dict_encoded_teams)
-            st.markdown('# WINNER:')
+            st.markdown('# WINNER')
             winner_team = ''
             if probability < 0.5:
                 winner = option_away

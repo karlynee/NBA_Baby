@@ -74,6 +74,7 @@ def main():
     # Title
     st.title("Welcome to the NBAddicts dashboard")
     st.write("Where statistics and NBA make a great match 📈 ❤️")
+    st.title(" ")
 
 
     # --------------------- Scraping info de la veille

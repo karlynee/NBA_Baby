@@ -117,7 +117,7 @@ with st.container():
     
     with col9 : 
         metricast, team_ast, team_rank_ast = scorecards (df_cleaned_all_stats_light_final_22_23_24,option,st.session_state.selected_season,metric_column='AST',rank_column='rank_AST')
-        st.metric(label = metricast, value = team_ast,delta=f"Rank {team_rank_ast}/30", help="3 points field goals %")
+        st.metric(label = metricast, value = team_ast,delta=f"Rank {team_rank_ast}/30", help="Number of assists per match")
     
     with col10 : 
         metrictrb, team_trb, team_rank_trb = scorecards (df_cleaned_all_stats_light_final_22_23_24,option,st.session_state.selected_season,metric_column='TRB',rank_column='rank_TRB')
@@ -145,6 +145,9 @@ with st.expander('Click for more stats'):
         with col1 : 
             shoot_fig = shootbyteam (df_cleaned_all_stats_light_final_22_23_24,option,st.session_state.selected_season)
             st.plotly_chart(shoot_fig, theme='streamlit')
+
+
+    st.header('Major 5')
 
     with st.container():
         # major_5_fig = major5byteam (df_players_all_stats,option,st.session_state.selected_season)

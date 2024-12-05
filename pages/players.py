@@ -77,7 +77,8 @@ with st.container():
 
             with col6: 
                 metric_column_per,player_metric_per = sc_pres2(df_players_all_stats, option,st.session_state.selected_season, metric_column='PER')
-                st.metric(label = metric_column_per, value = player_metric_per)
+                st.metric(label = metric_column_per, value = player_metric_per, delta=f"avg league: 15", help="Player Efficiency Rating - A measure of per-minute production")
+
 
     # with col1:
         
