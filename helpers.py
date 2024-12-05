@@ -21,6 +21,17 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 import numpy as np
 import time
+import pandas as pd
+import requests
+from bs4 import BeautifulSoup
+from sklearn.preprocessing import LabelEncoder
+from sklearn.linear_model import LogisticRegression
+import pandas as pd
+import numpy as np
+import pickle
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
 
 # Cache Data
 #st.cache_data(ttl=600)
@@ -1289,3 +1300,237 @@ def call_players() :
     'Alize Johnson', 'Frank Jackson', 'Amari Bailey', 'Alex Fudge',
     'Isaiah Wong', 'Jalen Slawson', 'Jalen Hood-Schifino',
     'D.J. Wilson', 'Serge Ibaka']
+
+
+#--------------------------------------------------------------------PRED------------------------------------------------------#
+# UTILS
+def save_model_with_pickle(model, filename):
+    """
+    Save the trained model to a .pkl file using the pickle library.
+
+    Args:
+        model: The trained machine learning model to be saved.
+        filename (str): The path and name of the file to save the model (e.g., 'model.pkl').
+
+    Returns:
+        None
+    """
+    try:
+        with open(filename, 'wb') as file:
+            pickle.dump(model, file)
+        print(f"Model successfully saved to {filename}")
+    except Exception as e:
+        print(f"Error saving model: {e}")
+
+def load_model_with_pickle(filename):
+    """
+    Load a model from a .pkl file using the pickle library.
+
+    Args:
+        filename (str): The path and name of the .pkl file containing the saved model.
+
+    Returns:
+        model: The loaded machine learning model.
+    """
+    try:
+        with open(filename, 'rb') as file:
+            model = pickle.load(file)
+        #print(f"Model successfully loaded from {filename}")
+        return model
+    except Exception as e:
+        print(f"Error loading model: {e}")
+        return None
+
+#nba_data_schedules_23_24_25
+# SCRAP SCHEDULE
+def scrape_schedule_season_data(year):
+    # Construire l'URL pour la saison donnée
+    base_url = f"https://www.basketball-reference.com/leagues/NBA_{year}_games.html"
+    print(base_url)
+    response = requests.get(base_url)
+    print(response)
+    soup = BeautifulSoup(response.text, 'html.parser')
+    print(soup)
+    # Trouver les liens pour les mois (October à April)
+    links = soup.find_all('a', text=['October', 'November', 'December', 'January', 'February', 'March', 'April'])
+    print(links)
+    # Récupérer les tableaux pour chaque mois
+    all_data = []
+    for link in links:
+        print(link['href'])
+        month_url = "https://www.basketball-reference.com" + link['href']
+        monthly_tables = pd.read_html(month_url)
+        table = monthly_tables[0]  # Supposons que le premier tableau contient les données
+        table['Year'] = year  # Ajouter une colonne pour l'année
+        all_data.append(table)
+    print(f'all data >> {all_data}')
+    # Combiner les données mensuelles pour la saison
+    season_data = pd.concat(all_data, axis=0)
+    return season_data
+
+def combine_scraped_schedule_2_years(year1=2024,year2=2025):
+  print('>>')
+  nba_data_2024 = scrape_schedule_season_data(year1)
+  print('>>>')
+  print(nba_data_2024.head(1))
+  nba_data_2025 = scrape_schedule_season_data(year2)
+  print(nba_data_2025.head(1))
+  nba_data_schedules_23_24_25 = pd.concat([nba_data_2024, nba_data_2025], axis=0)
+  nba_data_schedules_23_24_25 = nba_data_schedules_23_24_25.rename(columns={"Visitor/Neutral": "Team1",
+                                                                          "PTS": "Team1Score",
+                                                                          "Home/Neutral": "Team2",
+                                                                          "PTS.1": "Team2Score",
+                                                                          })
+  return nba_data_schedules_23_24_25
+
+# SCRAPE MATCHS PER TEAMS
+def scrape_matches_per_teams():
+      # URL de la page des stats "Per Game"
+  url = "https://www.basketball-reference.com/leagues/NBA_2025.html"
+
+  # Headers pour éviter d'être bloqué par le site
+  headers = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"}
+
+  # Envoyer une requête GET pour récupérer le contenu de la page
+  response = requests.get(url, headers=headers)
+
+  if response.status_code != 200:
+      print(f"Erreur lors de l'accès à la page : {response.status_code}")
+  else:
+      # Parser le contenu HTML
+      soup = BeautifulSoup(response.text, "html.parser")
+
+      # Trouver le tableau "Per Game"
+      table = soup.find("table", {"id": "per_game-team"})
+
+      if table:
+          # Extraire les en-têtes
+          headers = [th.text for th in table.find("thead").find_all("th")]
+          headers = headers[1:]  # Ignorer la première colonne vide
+
+          # Extraire les lignes du tableau
+          rows = []
+          for row in table.find("tbody").find_all("tr"):
+              # Vérifier si la ligne n'est pas un séparateur
+              if row.find("th", {"scope": "row"}):
+                  cells = [cell.text.strip() for cell in row.find_all("td")]
+                  rows.append(cells)
+
+          # Créer un DataFrame Pandas
+          df_teams_pergame_24_25 = pd.DataFrame(rows, columns=headers)
+  return df_teams_pergame_24_25
+
+def merge_scraped_matches_per_teams_bq_pred_prep(df_teams_pergame_24_25, nba_data_schedules_23_24_25):
+  # Enclose dataset and table names in backticks (`)
+  sql = "SELECT * FROM `nba-baby-442813.Teams.per_game_23_24`;"
+
+  df_teams_pergame_23_24 = pd.read_gbq(sql, project_id="nba-baby-442813", dialect="standard")
+  df_teams_pergame_23_24 = df_teams_pergame_23_24.rename(columns={
+    "FG_": "FG%",
+    "_3P": "3P",
+    "_3PA": "3PA",
+    "_3P_": "3P%",
+    "_2P": "2P",
+    "_2PA": "2PA",
+    "_2P_": "2P%",
+    "FT_": "FT%",
+  })
+  df_teams_pergame_23_24_25 = pd.concat([df_teams_pergame_23_24, df_teams_pergame_24_25], ignore_index=True)
+  df_teams_pergame_23_24_25 = df_teams_pergame_23_24_25.drop(["Rk"], axis=1)
+  df_teams_pergame_23_24_25 = df_teams_pergame_23_24_25.drop(df_teams_pergame_23_24_25 [df_teams_pergame_23_24_25 ['Team'] == 'League Average'].index)
+  conditions = [
+    nba_data_schedules_23_24_25['Team1Score'] > nba_data_schedules_23_24_25['Team2Score'],
+    nba_data_schedules_23_24_25['Team1Score'] < nba_data_schedules_23_24_25['Team2Score']
+  ]
+  choices=[1,0]
+  nba_data_schedules_23_24_25['Team1Win'] = np.select(conditions, choices, 1)
+  # Mergings the nba_data_schedules_23_24_25 and stats datasets, adding a prefix depending on which teams stats are being used
+  df_prediction_base = nba_data_schedules_23_24_25.merge(df_teams_pergame_23_24_25.add_prefix('Team1'), how='left', left_on=['Team1'],
+                    right_on=['Team1Team']).drop(['Team1Team'],
+                                                  axis=1).merge(df_teams_pergame_23_24_25.add_prefix('Team2'),
+                                                                              how='left', left_on=['Team2'],
+                                                                              right_on=['Team2Team']).drop(['Team2Team'],axis=1)
+  df_prediction_base = df_prediction_base.drop(["Unnamed: 6", "Unnamed: 7","Date","Attend.","LOG","Arena","Notes","Year","Start (ET)"], axis=1)
+  return df_prediction_base
+
+# PREDICTION
+def label_encoder_teams_pred():
+  teams = [
+    'Los Angeles Lakers', 'Phoenix Suns', 'Houston Rockets',
+    'Boston Celtics', 'Washington Wizards', 'Atlanta Hawks',
+    'Detroit Pistons', 'Minnesota Timberwolves', 'Cleveland Cavaliers',
+    'New Orleans Pelicans', 'Oklahoma City Thunder',
+    'Sacramento Kings', 'Dallas Mavericks', 'Portland Trail Blazers',
+    'Philadelphia 76ers', 'Denver Nuggets', 'New York Knicks',
+    'Miami Heat', 'Toronto Raptors', 'Brooklyn Nets',
+    'Los Angeles Clippers', 'Orlando Magic', 'Golden State Warriors',
+    'Chicago Bulls', 'Memphis Grizzlies', 'Indiana Pacers',
+    'Utah Jazz', 'San Antonio Spurs', 'Milwaukee Bucks',
+    'Charlotte Hornets'
+  ]
+  # Encodage avec LabelEncoder
+  le = LabelEncoder()
+  le.fit(teams)
+  # Dictionnaire des équipes avec leur encodage numérique
+  dict_encoded_teams = {team: int(le.transform([team])[0]) for team in teams}
+  # Affichage du dictionnaire
+  return dict_encoded_teams
+
+def train_and_export_model_as_pkl(df_prediction_base_path,dict_encoded_teams): 
+  df_prediction_base = pd.read_csv(df_prediction_base_path)
+  df_prediction_base['Team1'] = df_prediction_base['Team1'].replace(dict_encoded_teams)
+  df_prediction_base['Team2'] = df_prediction_base['Team2'].replace(dict_encoded_teams)
+  df_prediction_base = df_prediction_base.dropna().drop(columns=['Team2Score','Team1Score'], axis = 1)
+  log_reg = LogisticRegression()
+  X = df_prediction_base.drop(columns=['Team1Win'])
+  y = df_prediction_base['Team1Win']
+  X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+  #scaler = StandardScaler()
+  #X_train = scaler.fit_transform(X_train)
+  # apply same transformation on X_test
+  #X_test = scaler.transform(X_test)
+  # train model
+  clf = LogisticRegression(solver='lbfgs', max_iter=1000)
+  clf.fit(X_train, y_train)
+  # store predictions
+  y_pred = clf.predict(X_test)
+  save_model_with_pickle(clf,'LR_model.pkl')  
+
+
+def predict_team1_win(_team1_name, _team2_name, df_prediction_base_path, model, dict_encoded_teams):
+    """
+    Predict if Team1 will win against Team2 using a trained Logistic Regression model.
+    
+    Args:
+        team1_name (str): Name of Team1
+        team2_name (str): Name of Team2
+        df (pd.DataFrame): DataFrame containing team statistics
+        model: Trained logistic regression model
+        scaler: Scaler used for preprocessing (if any, e.g., StandardScaler)
+    
+    Returns:
+        float: Probability of Team1 winning
+        int: Predicted label (0 or 1)
+    """
+    df_prediction_base = pd.read_csv(df_prediction_base_path)
+    team1_name = dict_encoded_teams[_team1_name]
+    team2_name = dict_encoded_teams[_team2_name]
+    df_prediction_base['Team1'] = df_prediction_base['Team1'].replace(dict_encoded_teams)
+    df_prediction_base['Team2'] = df_prediction_base['Team2'].replace(dict_encoded_teams)
+    df_prediction_base = df_prediction_base.dropna().drop(columns=['Team2Score','Team1Score','Team1Win'], axis = 1)
+    team1_stats = df_prediction_base[df_prediction_base['Team1'] == team1_name].iloc[0].filter(like='Team1')
+    team2_stats = df_prediction_base[df_prediction_base['Team2'] == team2_name].iloc[0].filter(like='Team2')
+    # Combine the features into a single row
+    combined_features = pd.concat([team1_stats, team2_stats]).to_frame().T
+    #print(combined_features)
+    columns = list(combined_features.columns)
+    columns.remove('Team2')  # Remove 'Team2' from its current position
+    columns.insert(1, 'Team2')  # Insert 'Team2' at index 1
+    # Reorder the DataFrame
+    combined_features = combined_features[columns]
+    display(combined_features)
+    # Predict the probability and label
+    probability = model.predict_proba(combined_features)[:, 1][0]  # Probability of Team1 winning
+    prediction = model.predict(combined_features)[0]  # 0 or 1
+
+    return probability, prediction

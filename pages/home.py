@@ -10,7 +10,6 @@ from plotly.subplots import make_subplots
 from datetime import datetime, timedelta
 import os
 import sys
-from streamlit_carousel import carousel
 
 # Ajouter le répertoire parent (nba_app) au sys.path pour pouvoir importer helpers.py
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

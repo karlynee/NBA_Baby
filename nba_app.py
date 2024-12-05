@@ -88,7 +88,11 @@ def main():
     #         st.write(f"{team1_name} {team1_score} vs {team2_name} {team2_score}")
     # else:
     #     st.write("No matches found for this date.")
-
+    # --------------------- Carroussel
+    st.header("Latest games")
+    matches = ['Results:', 'Detroit 120 – Boston 130', 'Indiana 90 – Brooklyn 99', 'Minnesota 108 - LA Clippers 80', 'LA Lakers 93 – Miami 134', 'Atlanta 119 – Milwaukee 104', 'Orlando 106 – Philadelphia 102']
+        # Dropdown menu:
+    st.selectbox('',matches)
     # 2. Seasons buttons
     #season = st.radio("Select a season:",('2022-2023', '2023-2024'))
     st.session_state.selected_season = '23-24'
