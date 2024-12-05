@@ -11,3 +11,4 @@ Unidecode
 Matplotlib
 numpy
 carousel
+scikit-learn
