@@ -10,3 +10,4 @@ beautifulsoup4
 Unidecode
 Matplotlib
 numpy
+carousel

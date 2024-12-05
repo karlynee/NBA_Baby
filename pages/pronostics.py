@@ -9,8 +9,6 @@ from helpers import (
     get_bigquery_client, 
     import_teams_all_stats_light_from_sql, 
     import_teams_victory_defeat_from_sql,
-    scorecards, donutWL, shootbyteam, scorecard_rank,
-    win_loss, get_team_logos, major5byteam,
     import_players_all_stats_from_sql
 )
 
@@ -31,9 +29,15 @@ st.set_page_config(
     layout="wide",   # 'centered' ou 'wide'
     )
 
-st.sidebar.title('🏀 NBAddicts 🏀')
-st.sidebar.page_link('pages/home.py', label='🏠 Home')
-st.sidebar.page_link('pages/players.py', label='⛹️ Players')
-st.sidebar.page_link('pages/teams.py', label='🤝 Teams')
-st.sidebar.page_link('pages/pronostics.py', label='🔮 Future Games Predictions')
 st.sidebar.image("https://cdn.nba.com/logos/leagues/logo-nba.svg", use_container_width=True)
+try:
+    st.markdown( """ <style> /* Style for sidebar title */ [data-testid="stSidebar"] h1 { color: #ffffff; /* Change title color */ font-size: 24px; /* Change title font size */ font-weight: bold; /* Make title bold */ } /* Style for links in the sidebar */ [data-testid="stSidebar"] .css-q8sbsg { color: #ffffff !important; /* Link text color */ font-size: 18px; /* Adjust font size */ font-weight: bold; /* Make links bold */ } /* Hover effect for links */ [data-testid="stSidebar"] .css-q8sbsg:hover { color: #E76F51 !important; /* Change color on hover */ text-decoration: underline; /* Underline on hover */ } </style> """, unsafe_allow_html=True, )    # Sidebar navigation
+    st.sidebar.title('🏀 NBAddicts 🏀')
+    st.sidebar.page_link('pages/home.py', label='🏠 Home')
+    st.sidebar.page_link('pages/players.py', label='⛹️ Players')
+    st.sidebar.page_link('pages/teams.py', label='🤝 Teams')
+    st.sidebar.page_link('pages/pronostics.py', label='🔮 Future Games Predictions')
+    st.sidebar.page_link('pages/about_us.py', label='ℹ️ About us')
+
+except:
+    'Page not available'
