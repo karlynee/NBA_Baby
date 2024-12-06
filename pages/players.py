@@ -32,7 +32,6 @@ st.set_page_config(
     )
 try: 
     st.sidebar.image("https://cdn.nba.com/logos/leagues/logo-nba.svg", use_container_width=True)
-    st.markdown( """ <style> /* Style for sidebar title */ [data-testid="stSidebar"] h1 { color: #ffffff; /* Change title color */ font-size: 24px; /* Change title font size */ font-weight: bold; /* Make title bold */ } /* Style for links in the sidebar */ [data-testid="stSidebar"] .css-q8sbsg { color: #ffffff !important; /* Link text color */ font-size: 18px; /* Adjust font size */ font-weight: bold; /* Make links bold */ } /* Hover effect for links */ [data-testid="stSidebar"] .css-q8sbsg:hover { color: #E76F51 !important; /* Change color on hover */ text-decoration: underline; /* Underline on hover */ } </style> """, unsafe_allow_html=True, )    # Sidebar navigation
     st.sidebar.title('🏀 NBAddicts 🏀')
     st.sidebar.page_link('pages/home.py', label='🏠 Home')
     st.sidebar.page_link('pages/players.py', label='⛹️ Players')
@@ -80,22 +79,22 @@ with st.container():
                 st.metric(label = metric_column_per, value = player_metric_per, delta=f"avg league: 15", help="Player Efficiency Rating - A measure of per-minute production")
 
 
-    # with col1:
+    with col1:
         
         # --------------------- Scraping images players
         # Afficher l'image du joueur sélectionné
-        # var_get_player_image_url = get_player_image_url(option)
-        # var_get_player_url = get_player_url(option)
-        # selected_player = option
-        # try:
-        #     if selected_player:
-        #         img_url = get_player_image_url(selected_player)
-        #     if img_url:
-        #         st.image(img_url, width= 160, use_container_width=False)
-        #     else:
-        #         st.write(f"Photo de {selected_player} non disponible.")
-        # except:
-        #     st.write(f'{option} did not play during the season {st.session_state.selected_season}')
+        var_get_player_image_url = get_player_image_url(option)
+        var_get_player_url = get_player_url(option)
+        selected_player = option
+        try:
+            if selected_player:
+                img_url = get_player_image_url(selected_player)
+            if img_url:
+                st.image(img_url, width= 160, use_container_width=False)
+            else:
+                st.write(f"Photo de {selected_player} non disponible.")
+        except:
+            st.write(f'{option} did not play during the season {st.session_state.selected_season}')
 st.write('')
 st.write('')
 with st.container():

@@ -49,17 +49,6 @@ def main():
             """, unsafe_allow_html=True)
     st.sidebar.image("https://cdn.nba.com/logos/leagues/logo-nba.svg", use_container_width=True)
     try:
-        st.markdown( """ <style> /* Style for sidebar title */ [data-testid="stSidebar"] h1 { color: #ffffff; /* Change title color */ font-size: 24px; /* Change title font size */ font-weight: bold; /* Make title bold */ } /* Style for links in the sidebar */ [data-testid="stSidebar"] .css-q8sbsg { color: #ffffff !important; /* Link text color */ font-size: 18px; /* Adjust font size */ font-weight: bold; /* Make links bold */ } /* Hover effect for links */ [data-testid="stSidebar"] .css-q8sbsg:hover { color: #E76F51 !important; /* Change color on hover */ text-decoration: underline; /* Underline on hover */ } </style> """, unsafe_allow_html=True, )    # Sidebar navigation
-        st.markdown(
-            """
-            <style>
-            body {
-                color: white;
-            }
-            </style>
-            """,
-            unsafe_allow_html=True
-        )
         st.sidebar.title('🏀 NBAddicts 🏀')
         st.sidebar.page_link('pages/home.py', label='🏠 Home')
         st.sidebar.page_link('pages/players.py', label='⛹️ Players')
@@ -113,8 +102,6 @@ def main():
         if col2.button("2023-2024"):
             st.session_state.selected_season = '23-24'
 
-    with st.container():
-        st.title(" ")
 
     # -------------------------------- Top 3 tables
     rank_top_player = Rank_top_player(df_players_all_stats,st.session_state.selected_season)

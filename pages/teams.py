@@ -35,7 +35,6 @@ st.set_page_config(
    # Sidebar navigation
 st.sidebar.image("https://cdn.nba.com/logos/leagues/logo-nba.svg", use_container_width=True)
 try:
-    st.markdown( """ <style> /* Style for sidebar title */ [data-testid="stSidebar"] h1 { color: #ffffff; /* Change title color */ font-size: 24px; /* Change title font size */ font-weight: bold; /* Make title bold */ } /* Style for links in the sidebar */ [data-testid="stPageLink-NavLink"] .css-q8sbsg { color: #ffffff !important; /* Link text color */ font-size: 18px; /* Adjust font size */ font-weight: bold; /* Make links bold */ } /* Hover effect for links */ [data-testid="stSidebar"] .css-q8sbsg:hover { color: #E76F51 !important; /* Change color on hover */ text-decoration: underline; /* Underline on hover */ } </style> """, unsafe_allow_html=True, )    # Sidebar navigation
     st.sidebar.title('🏀 NBAddicts 🏀')
     st.sidebar.page_link('pages/home.py', label='🏠 Home')
     st.sidebar.page_link('pages/players.py', label='⛹️ Players')
@@ -159,57 +158,57 @@ with st.expander('Click for more stats'):
         with col1 : 
             maj5_PG=major5byteam2(df_players_all_stats,option,st.session_state.selected_season, position='PG')
             st.write(maj5_PG)
-            # var_get_player_image_url = get_player_image_url(maj5_PG)
-            # var_get_player_url = get_player_url(maj5_PG)
-            # selected_player = maj5_PG
-            # if selected_player:
-            #     img_url = get_player_image_url(selected_player)
-            # if img_url:
-            #     st.image(img_url, width= 100, use_container_width=False)
+            var_get_player_image_url = get_player_image_url(maj5_PG)
+            var_get_player_url = get_player_url(maj5_PG)
+            selected_player = maj5_PG
+            if selected_player:
+                img_url = get_player_image_url(selected_player)
+            if img_url:
+                st.image(img_url, width= 100, use_container_width=False)
             st.write('Point Guard')
         with col2 : 
             maj5_SG=major5byteam2(df_players_all_stats,option,st.session_state.selected_season, position='SG')
             st.write(maj5_SG)
-            # var_get_player_image_url = get_player_image_url(maj5_SG)
-            # var_get_player_url = get_player_url(maj5_SG)
-            # selected_player = maj5_SG
-            # if selected_player:
-            #     img_url = get_player_image_url(selected_player)
-            # if img_url:
-            #     st.image(img_url, width= 100, use_container_width=False)
+            var_get_player_image_url = get_player_image_url(maj5_SG)
+            var_get_player_url = get_player_url(maj5_SG)
+            selected_player = maj5_SG
+            if selected_player:
+                img_url = get_player_image_url(selected_player)
+            if img_url:
+                st.image(img_url, width= 100, use_container_width=False)
             st.write('Shooting Guard')
         with col3 : 
             maj5_PF=major5byteam2(df_players_all_stats,option,st.session_state.selected_season, position='PF')
             st.write(maj5_PF)
-            # var_get_player_image_url = get_player_image_url(maj5_PF)
-            # var_get_player_url = get_player_url(maj5_PF)
-            # selected_player = maj5_PF
-            # if selected_player:
-            #     img_url = get_player_image_url(selected_player)
-            # if img_url:
-            #     st.image(img_url, width= 100, use_container_width=False)
+            var_get_player_image_url = get_player_image_url(maj5_PF)
+            var_get_player_url = get_player_url(maj5_PF)
+            selected_player = maj5_PF
+            if selected_player:
+                img_url = get_player_image_url(selected_player)
+            if img_url:
+                st.image(img_url, width= 100, use_container_width=False)
             st.write('Power Forward')
         with col4 : 
             maj5_SF=major5byteam2(df_players_all_stats,option,st.session_state.selected_season, position='SF')
             st.write(maj5_SF)
-            # var_get_player_image_url = get_player_image_url(maj5_SF)
-            # var_get_player_url = get_player_url(maj5_SF)
-            # selected_player = maj5_SF
-            # if selected_player:
-            #     img_url = get_player_image_url(selected_player)
-            # if img_url:
-            #     st.image(img_url, width= 100, use_container_width=False)
+            var_get_player_image_url = get_player_image_url(maj5_SF)
+            var_get_player_url = get_player_url(maj5_SF)
+            selected_player = maj5_SF
+            if selected_player:
+                img_url = get_player_image_url(selected_player)
+            if img_url:
+                st.image(img_url, width= 100, use_container_width=False)
             st.write('Small Forward')
         with col5 : 
             maj5_C=major5byteam2(df_players_all_stats,option,st.session_state.selected_season, position='C')
             st.write(maj5_C)
-            # var_get_player_image_url = get_player_image_url(maj5_C)
-            # var_get_player_url = get_player_url(maj5_C)
-            # selected_player = maj5_C
-            # if selected_player:
-            #     img_url = get_player_image_url(selected_player)
-            # if img_url:
-            #   st.image(img_url, width= 100, use_container_width=False)
+            var_get_player_image_url = get_player_image_url(maj5_C)
+            var_get_player_url = get_player_url(maj5_C)
+            selected_player = maj5_C
+            if selected_player:
+                img_url = get_player_image_url(selected_player)
+            if img_url:
+              st.image(img_url, width= 100, use_container_width=False)
             st.write('Center')
 
 
