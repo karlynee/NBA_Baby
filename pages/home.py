@@ -102,8 +102,7 @@ def main():
     st.session_state.selected_season = '23-24'
 
     with st.container():
-        st.write("")
-        st.write("")
+        st.title(" ")
 
     with st.container():
         col1, col2 = st.columns([1, 10])

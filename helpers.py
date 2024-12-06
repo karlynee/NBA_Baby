@@ -925,7 +925,6 @@ def Rank_conference_W_E(_df,_season):
                 header=dict(
                     values=df_RK_filtered_West.columns,
                     align="center",
-                    fill_color='lightblue',
                     font=dict(size=12)
                 ),
                 cells=dict(
@@ -944,7 +943,6 @@ def Rank_conference_W_E(_df,_season):
                 header=dict(
                     values=df_RK_filtered_East.columns,
                     align="center",
-                    fill_color='lightblue',
                     font=dict(size=12)
                 ),
                 cells=dict(

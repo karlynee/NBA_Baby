@@ -80,22 +80,22 @@ with st.container():
                 st.metric(label = metric_column_per, value = player_metric_per, delta=f"avg league: 15", help="Player Efficiency Rating - A measure of per-minute production")
 
 
-    with col1:
+    # with col1:
         
         # --------------------- Scraping images players
         # Afficher l'image du joueur sélectionné
-        var_get_player_image_url = get_player_image_url(option)
-        var_get_player_url = get_player_url(option)
-        selected_player = option
-        try:
-            if selected_player:
-                img_url = get_player_image_url(selected_player)
-            if img_url:
-                st.image(img_url, width= 160, use_container_width=False)
-            else:
-                st.write(f"Photo de {selected_player} non disponible.")
-        except:
-            st.write(f'{option} did not play during the season {st.session_state.selected_season}')
+        # var_get_player_image_url = get_player_image_url(option)
+        # var_get_player_url = get_player_url(option)
+        # selected_player = option
+        # try:
+        #     if selected_player:
+        #         img_url = get_player_image_url(selected_player)
+        #     if img_url:
+        #         st.image(img_url, width= 160, use_container_width=False)
+        #     else:
+        #         st.write(f"Photo de {selected_player} non disponible.")
+        # except:
+        #     st.write(f'{option} did not play during the season {st.session_state.selected_season}')
 st.write('')
 st.write('')
 with st.container():

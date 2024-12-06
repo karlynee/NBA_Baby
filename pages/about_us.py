@@ -80,6 +80,11 @@ with st.container():
         st.write("NBA official website for team logos and NBA updates. (https://www.nba.com/games)")
         st.write("YouTube for our PowerPoint presentation. (https://www.youtube.com/watch?v=fA20AqLuDjc)")
         st.write("Whether you’re here to explore stats, challenge yourself, or deepen your love for basketball, this is the place for you.")
+        st.header("Authors") 
+        st.write("Jeremy Boyer")
+        st.write("Thomas Quatreboeufs")
+        st.write("Karlyne Malonga Linkedin")
+        st.write("")
 
     with col2 : 
         st.write(" ")
