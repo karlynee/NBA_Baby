@@ -70,15 +70,19 @@ def main():
 
     # --------------------- Scraping info de la veille
     st.header("Latest games results")
-    yesterday = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
-    matches = yesterday_results(yesterday)
 
-    if matches:
-        for match in matches:
-            team1_name, team1_score, team2_name, team2_score = match
-            st.write(f"{team1_name} {team1_score} vs {team2_name} {team2_score}")
-    else:
-        st.write("No matches found for this date.")
+    with st.expander('Click to see the latest games results'):
+            with st.container():
+
+                yesterday = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
+                matches = yesterday_results(yesterday)
+
+                if matches:
+                    for match in matches:
+                        team1_name, team1_score, team2_name, team2_score = match
+                        st.write(f"{team1_name} {team1_score} vs {team2_name} {team2_score}")
+                else:
+                    st.write("No matches found for this date.")
 
 
     # --------------------- Carroussel
