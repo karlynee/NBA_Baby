@@ -41,7 +41,7 @@ try:
     st.sidebar.page_link('pages/players.py', label='⛹️ Players')
     st.sidebar.page_link('pages/teams.py', label='🤝 Teams')
     st.sidebar.page_link('pages/pronostics.py', label='🔮 Future Games Predictions')
-    st.sidebar.page_link('pages/about_us.py', label='ℹ️ About us')
+    st.sidebar.page_link('pages/about_us.py', label='🧑 About us')
 
 except:
     'Page not available'
