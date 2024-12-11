@@ -164,7 +164,7 @@ st.header(" ")
 st.header(" ")
 st.header(" ")
 
-with st.expander('How does the magic happen?✨'):
+with st.expander('How does the magic happen2?✨'):
     with st.container():
         st.header("How does it work?")
         st.write("Machine learning trains algorithms to find patterns in data and make predictions. The algorithm learns from input data, then applies this knowledge to new data to predict outcomes. It improves as it processes more data.")
