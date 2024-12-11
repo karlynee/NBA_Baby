@@ -155,3 +155,17 @@ with st.container():
 
         except:
             st.write('')
+
+st.header(" ")
+st.header(" ")
+st.header(" ")
+st.header(" ")
+st.header(" ")
+st.header(" ")
+st.header(" ")
+
+with st.expander('How does the magic happen?✨'):
+    with st.container():
+        st.header("How does it work?")
+        st.write("Machine learning trains algorithms to find patterns in data and make predictions. The algorithm learns from input data, then applies this knowledge to new data to predict outcomes. It improves as it processes more data.")
+        st.write('The metrics used for our machine learning model are the following : 2-Point Field Goals, 2-Point Field Goal Percentage, 2-Point Field Goal Attempts, 3-Point Field Goals, 3-Point Field Goal Percentage, 3-Point Field Goal Attempts, Assists, Blocks, Defensive Rebounds, Field Goals, Field Goal Percentage, Field Goal Attempts, Free Throws, Free Throw Percentage, Free Throw Attempts, Games, Minutes Played, Offensive Rebounds, Personal Fouls, Points, Steals, Turnovers, and Total Rebounds.')

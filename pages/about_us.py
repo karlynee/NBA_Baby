@@ -54,13 +54,12 @@ with st.container():
     
     with col1 : 
         st.header("About Us")
-        st.write('The metrics used for our machine learning model are the following : 2-Point Field Goals, 2-Point Field Goal Percentage, 2-Point Field Goal Attempts, 3-Point Field Goals, 3-Point Field Goal Percentage, 3-Point Field Goal Attempts, Assists, Blocks, Defensive Rebounds, Field Goals, Field Goal Percentage, Field Goal Attempts, Free Throws, Free Throw Percentage, Free Throw Attempts, Games, Minutes Played, Offensive Rebounds, Personal Fouls, Points, Steals, Turnovers, and Total Rebounds.')
+        st.write('Welcome to our basketball analytics platform 🏀 — your ultimate destination for exploring the world of NBA stats, insights, and predictions 📊. This project was conceived to make basketball data accessible, engaging, and empowering for fans and enthusiasts alike. It was created as a group project by 4 Data Analytics students from Le Wagon 👩‍💻👨‍💻, completed in just two weeks in December 2024.')
+        st.write("Explore comprehensive data on teams and players with detailed stats and analyses from past seasons and real-time insights from the current season. We offer interactive graphs that bring the game’s stats to life, helping you better understand team and player performance. Our prediction page lets you test your knowledge by forecasting matchups and comparing your results to our machine learning model, which delivers a 65% accuracy rate based on key metrics like Field Goal Percentage (FG%) and Assists (AST).")
         st.header("Our Data Sources") 
         st.write("To build this website and its dashboards, we sourced our data from these resources:")
         st.write("Basketball Reference for detailed player and team stats. (https://www.basketball-reference.com)")
         st.write("NBA official website for team logos and NBA updates. (https://www.nba.com/games)")
-        st.write("YouTube for our PowerPoint presentation. (https://www.youtube.com/watch?v=fA20AqLuDjc)")
-        st.write("Whether you’re here to explore stats, challenge yourself, or deepen your love for basketball, this is the place for you.")
         st.header("Authors")
         url1='https://www.linkedin.com/in/thomas-quatreboeufs-72199871/'
         url2='https://www.linkedin.com/in/jeremyboyer/'

@@ -62,14 +62,14 @@ def main():
 
     # Title
     st.title("Welcome to the NBAddicts dashboard")
-    st.write("Where statistics and NBA make a great match 📈 ❤️")
+    st.write("Where statistics and NBA make a great match 📈✨ ")
     st.title(" ")
 
 
     # --------------------- Scraping info de la veille
     st.header("Latest games results")
 
-    with st.expander('Click to see the latest games results'):
+    with st.expander('Click for the latest games results'):
             with st.container():
 
                 yesterday = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
