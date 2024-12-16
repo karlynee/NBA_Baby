@@ -62,7 +62,7 @@ def main():
 
 
     # Title
-    st.title("Welcome to the NBAddicts dashboard")
+    st.title("Welcome to the NBAddicts Dashboard")
     st.write("Where statistics and NBA make a great match 📈✨ ")
     st.title(" ")
 
