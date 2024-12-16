@@ -80,7 +80,7 @@ def main():
                 if matches:
                     for match in matches:
                         team1_name, team1_score, team2_name, team2_score = match
-                        st.write(f"{team1_name} {team1_score} vs {team2_name} {team2_score}")
+                        st.write(f"{team1_name} {team1_score} -- {team2_name} {team2_score}")
                 else:
                     st.write("No matches found for this date.")
 
