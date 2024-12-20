@@ -162,7 +162,6 @@ st.header(" ")
 st.header(" ")
 st.header(" ")
 st.header(" ")
-st.header(" ")
 
 with st.expander('How does the magic happen?✨'):
     with st.container():
