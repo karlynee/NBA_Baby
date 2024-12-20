@@ -82,7 +82,7 @@ def main():
                         team1_name, team1_score, team2_name, team2_score = match
                         st.write(f"{team1_name} {team1_score} -- {team2_name} {team2_score}")
                 else:
-                    st.write("No matches found for this date.")
+                    st.write("No matches found for yesterday.")
 
 
     # --------------------- Carroussel
